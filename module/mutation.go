@@ -27,9 +27,9 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Warnings to give back to user
-	var auditAnnotations map[string]string
-	keysRemoved := []string{""}
+	// Annotations which will show removed keys
+	auditAnnotations := make(map[string]string, 2)
+	var keysRemoved []string
 
 	// Patches operations to do
 	var patches []string
