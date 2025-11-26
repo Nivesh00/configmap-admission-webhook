@@ -15,7 +15,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	admissionReview, configmap, err := ParseAdmissionRequest(r)
 	if err != nil {
 		slog.Error(
-			"An error occured, cannot validate object",
+			"an error occured, cannot validate object",
 			"name",
 			configmap.GetName(),
 			"namespace",
@@ -26,6 +26,16 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+
+	slog.Info(
+		"proceeding to mutation of object",
+		"name",
+		configmap.GetName(),
+		"namespace",
+		configmap.GetNamespace(),
+		"kind",
+		configmap.GetObjectKind(),
+	)
 
 	// Annotations which will show removed keys
 	auditAnnotations := make(map[string]string, 2)
@@ -51,6 +61,17 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 			}
 			// Reject if key is forbidden
 			if slices.Contains(*forbiddenKeys, keyCheck) {
+				slog.Info(
+					"found forbidden key during mutation which will be removed",
+					"name",
+					configmap.GetName(),
+					"namespace",
+					configmap.GetNamespace(),
+					"kind",
+					configmap.GetObjectKind(),
+					"key",
+					key,
+				)
 				// Remove path
 				patchOperation := "{'op': 'remove', 'path': '/spec/data/" + key + "'}"
 				// Append to patches slice
@@ -84,7 +105,16 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	// Convert response to bytes
 	responseBytes, err := json.Marshal(&admissionReviewResponse)
 	if err != nil {
-		slog.Error("Cannot marshal response", slog.Any("error", err))
+		slog.Error(
+			"cannot marshal response",
+			"name",
+			configmap.GetName(),
+			"namespace",
+			configmap.GetNamespace(),
+			"kind",
+			configmap.GetObjectKind(),
+			slog.Any("error", err),
+		)
 	}
 
 	w.Write(responseBytes)

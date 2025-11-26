@@ -27,7 +27,7 @@ func AssignForbiddenKeys() error {
 	slog.Info(
 		"Finished processing user settings",
 		"forbidden keys",
-		strings.Join(GlobalForbiddenKeys.KeyList, " "),
+		"[" + strings.Join(GlobalForbiddenKeys.KeyList, ", ") + "]",
         "policy",
         policy,
         "case sensitive",

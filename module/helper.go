@@ -18,22 +18,22 @@ func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *core
 	// Parse request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.Error("Could not parse request body")
+		slog.Error("could not parse request body")
 		return nil, nil, err
 	}
 
-	slog.Info("Successfully parsed request body")
+	slog.Info("successfully parsed request body")
 
 	// Assign admission review to object, note that admissionReview is the upstream
 	// and e.g. pod could be used
 	var admissionReview admissionv1.AdmissionReview
 	if err := json.Unmarshal([]byte(body), &admissionReview); err != nil {
-		slog.Info("Could unmarshall request body")
+		slog.Info("could unmarshall request body")
 		return nil, nil, err
 	}
 
 	slog.Info(
-		"Successfully unmarshalled request body",
+		"successfully unmarshalled request body",
 		"name",
 		admissionReview.Request.Name,
 		"namespace",
@@ -47,7 +47,7 @@ func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *core
 	// Assign admission request object to specific k8s object
 	var configmap corev1.ConfigMap
 	if err := json.Unmarshal(admissionReview.Request.Object.Raw, &configmap); err != nil {
-		slog.Info("Could not parse k8s object")
+		slog.Info("could not parse k8s object")
 		return nil, nil, err
 	}
 

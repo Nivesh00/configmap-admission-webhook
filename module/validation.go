@@ -15,7 +15,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 	admissionReview, configmap, err := ParseAdmissionRequest(r)
 	if err != nil {
 		slog.Error(
-			"An error occured, cannot validate object",
+			"an error occured, cannot validate object",
 			"name",
 			configmap.GetName(),
 			"namespace",
@@ -26,6 +26,16 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+
+	slog.Info(
+		"proceeding to validation of object",
+		"name",
+		configmap.GetName(),
+		"namespace",
+		configmap.GetNamespace(),
+		"kind",
+		configmap.GetObjectKind(),
+	)
 
 	// Variable to check if operation is allowed
 	allowed := true
@@ -48,6 +58,17 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		}
 		// Reject if key is forbidden
 		if slices.Contains(*forbiddenKeys, keyCheck) {
+			slog.Info(
+				"found forbidden key during validation",
+				"name",
+				configmap.GetName(),
+				"namespace",
+				configmap.GetNamespace(),
+				"kind",
+				configmap.GetObjectKind(),
+				"key",
+				key,
+			)
 			allowed = false
 			warnings = append(warnings, key)
 		}
@@ -55,7 +76,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 
 	// If object is rejected
 	if !allowed {
-		msg := "Forbidden keys found in configmap for policy " + policy
+		msg := "forbidden keys found in configmap for policy " + policy
 		// Prepend msg to warnings
 		warnings = append(
 			[]string{msg}, 
@@ -78,7 +99,16 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 	// Convert response to bytes
 	responseBytes, err := json.Marshal(&admissionReviewResponse)
 	if err != nil {
-		slog.Error("Cannot marshal response", slog.Any("error", err))
+		slog.Error(
+			"cannot marshal response",
+			"name",
+			configmap.GetName(),
+			"namespace",
+			configmap.GetNamespace(),
+			"kind",
+			configmap.GetObjectKind(),
+			slog.Any("error", err),
+		)
 	}
 
 	w.Write(responseBytes)
