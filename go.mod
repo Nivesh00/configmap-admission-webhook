@@ -1,4 +1,4 @@
-module github.com/Nivesh00/configmap-admission-webhook.git
+module github.com/Nivesh00/configmap-admission-webhook
 
 go 1.24.5
 
