@@ -2,7 +2,10 @@ module github.com/Nivesh00/configmap-admission-webhook/src
 
 go 1.24.5
 
-require k8s.io/api v0.34.2
+require (
+	k8s.io/api v0.34.2
+	k8s.io/apimachinery v0.34.2
+)
 
 require (
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
@@ -17,7 +20,6 @@ require (
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/apimachinery v0.34.2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
