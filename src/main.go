@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"github.com/Nivesh00/configmap-admission-webhook/module"
+	"github.com/Nivesh00/configmap-admission-webhook/src/module"
 )
 
 func main() {

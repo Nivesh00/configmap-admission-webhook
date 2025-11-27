@@ -122,7 +122,7 @@ spec:
         image: ghcr.io/nivesh00/configmap-admission-webhook:debug
         ports:
         - containerPort: 443
-        command: ["/build/configmap-admission-webhook"]
+        command: ["/bin/configmap-admission-webhook"]
         envFrom:
         - configMapRef:
             name: forbidden-keys

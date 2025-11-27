@@ -1,4 +1,4 @@
-module github.com/Nivesh00/configmap-admission-webhook
+module github.com/Nivesh00/configmap-admission-webhook/src
 
 go 1.24.5
 

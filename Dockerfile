@@ -5,19 +5,19 @@ FROM golang:1.24.5
 WORKDIR /app
 
 # Download Go modules
-COPY go.mod go.sum ./
+COPY src/go.mod src/go.sum ./
 RUN go mod download
 
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/engine/reference/builder/#copy
-COPY module/helper.go ./module/
-COPY module/global.go ./module/
-COPY main.go ./
-COPY module/mutation.go ./module/
-COPY module/validation.go ./module/
+COPY src/module/helper.go ./module/
+COPY src/module/global.go ./module/
+COPY src/module/mutation.go ./module/
+COPY src/module/validation.go ./module/
+COPY src/main.go ./
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /build/configmap-admission-webhook
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/configmap-admission-webhook
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
@@ -27,4 +27,4 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /build/configmap-admission-webhook
 EXPOSE 443
 
 # Run
-CMD ["/build/configmap-admission-webhook"]
+CMD ["/bin/configmap-admission-webhook"]
