@@ -3,7 +3,6 @@ package module
 import (
 	"encoding/json"
 	"io"
-    "log/slog"
     "net/http"
 
 	admissionv1 "k8s.io/api/admission/v1"
@@ -17,21 +16,21 @@ func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *core
 	// Parse request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.Error("could not parse request body")
+		Logger.Error("could not parse request body")
 		return nil, nil, err
 	}
 
-	slog.Info("successfully parsed request body")
+	Logger.Info("successfully parsed request body")
 
 	// Assign admission review to object, note that admissionReview is the upstream
 	// and e.g. pod could be used
 	var admissionReview admissionv1.AdmissionReview
 	if err := json.Unmarshal([]byte(body), &admissionReview); err != nil {
-		slog.Info("could unmarshall request body")
+		Logger.Info("could unmarshall request body")
 		return nil, nil, err
 	}
 
-	slog.Info(
+	Logger.Info(
 		"successfully unmarshalled request body",
 		"name", 	 admissionReview.Request.Name,
 		"namespace", admissionReview.Request.Namespace,
@@ -43,7 +42,7 @@ func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *core
 	// Assign admission request object to specific k8s object
 	var configmap corev1.ConfigMap
 	if err := json.Unmarshal(admissionReview.Request.Object.Raw, &configmap); err != nil {
-		slog.Info("could not parse k8s object")
+		Logger.Info("could not parse k8s object")
 		return nil, nil, err
 	}
 

@@ -22,7 +22,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /build/admission-webhook
 # Now copy it into our base image
 # Smaller, distroless
 FROM gcr.io/distroless/static-debian12
-COPY --from=build /build/admission-webhook /app
+COPY --from=build /build/admission-webhook /app/
 
 # Expose https port
 EXPOSE 443

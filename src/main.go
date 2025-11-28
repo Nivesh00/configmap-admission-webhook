@@ -3,19 +3,27 @@ package main
 import (
 	"log/slog"
 	"net/http"
+    "fmt"
 	"os"
+    "flag"
 	"github.com/Nivesh00/configmap-admission-webhook/src/module"
 )
 
 func main() {
+    
+    fmt.Println("starting up server...")
 
-    slog.Info("starting up program")
+    // Flags
+    logLevel := flag.String("log-level", "warn", "log level, default is warn")
+    port     := flag.String("port", "443", "port server listens to")
+    flag.Parse()
+    module.CreateLogger(logLevel)
 
     // Look for forbidden keys in environmental variables
     // and create a global variable from it
     err := module.AssignForbiddenKeys()
     if err != nil {
-        slog.Error("a fatal problem occured, cannot continue", slog.Any("error", err))
+        module.Logger.Error("a fatal problem occured, cannot continue", slog.Any("error", err))
         os.Exit(1)
     }
 
@@ -23,14 +31,14 @@ func main() {
     http.HandleFunc("/mutate", module.HandleMutation)
 
     // TLS server
-    slog.Info("listening on port :443")
+    fmt.Println("server now listening on port " + *port)
     err = http.ListenAndServeTLS(
-        ":443", 
+        ":" + *port, 
         "/etc/certs/tls.crt", 
         "/etc/certs/tls.key", 
         nil,
     )
-    slog.Error("an error occured, stopping server", slog.Any("error", err))
+    module.Logger.Error("an error occured, server shutting down", slog.Any("error", err))
     os.Exit(1)
 }
 

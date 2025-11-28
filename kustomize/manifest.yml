@@ -12,6 +12,8 @@ metadata:
 data:
   FORBIDDEN_KEYS: >-
     API_KEYS, PASSWORD
+  POLICY: AUTO
+  CASE_SENSITIVE: "false"
 
 ---
 apiVersion: v1
@@ -123,6 +125,7 @@ spec:
         ports:
         - containerPort: 443
         command: ["/app/admission-webhook"]
+        args: ["--log-level", "debug"]
         envFrom:
         - configMapRef:
             name: forbidden-keys

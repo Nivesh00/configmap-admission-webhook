@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"strconv"
 
 	admissionv1 "k8s.io/api/admission/v1"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +34,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 	objGroup 	 := configmap.GetObjectKind().GroupVersionKind().Group
 	objKind  	 := configmap.GetObjectKind().GroupVersionKind().Kind
 
-	slog.Info(
+	Logger.Info(
 		"proceeding to validation of object",
 		"name", 	 objName,
 		"namespace", objNamespace,
@@ -62,7 +63,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		}
 		// Reject if key is forbidden
 		if slices.Contains(*forbiddenKeys, keyCheck) {
-			slog.Info(
+			Logger.Info(
 				"found forbidden key during validation",
 				"name", 	 objName,
 				"namespace", objNamespace,
@@ -76,25 +77,24 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Result for user in case object is invalid
-	caseSetting := "on"
-	if !caseSensitive {
-		caseSetting = "off"
-	}
-	result := &metav1.Status{
-		Status: "failure",
-		Message: 
-			"Using policy " + policy + " and case sensitive " + caseSetting +
-			", forbidden keys were found during validation: [" +
-			strings.Join(forbiddenKeysFound, ", ") + "]",
-		Code: 406,
-	}
-
 	// Create admission response
 	admissionResponse := admissionv1.AdmissionResponse{
 		UID: 	  admissionRequest.UID,
 		Allowed:  allowed,
-		Result:   result,
+	}
+
+	// Result if failure
+	if !allowed {
+		// User result
+		result := &metav1.Status{
+			Status: "Failure",
+			Message: 
+				"using policy '" + policy + "' " +
+				"and case sensitive '" + strconv.FormatBool(caseSensitive) + "', " +
+				"following forbidden keys were found: [" + strings.Join(forbiddenKeysFound, ", ") + "]",
+			Code: 406,
+		}
+		admissionResponse.Result = result
 	}
 
 	// Create admission review response
@@ -108,7 +108,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 	// Convert response to bytes
 	responseBytes, err := json.Marshal(&admissionReviewNew)
 	if err != nil {
-		slog.Error(
+		Logger.Error(
 			"cannot marshal response",
 			"name", 	 objName,
 			"namespace", objNamespace,
@@ -118,7 +118,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	slog.Info(
+	Logger.Info(
 		"validation done",
 		"name", 	 objName,
 		"namespace", objNamespace,

@@ -5,16 +5,18 @@ import (
 	"log/slog"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 
 	admissionv1 "k8s.io/api/admission/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func HandleMutation(w http.ResponseWriter, r *http.Request) {
 
 	admissionReviewOld, configmap, err := ParseAdmissionRequest(r)
 	if err != nil {
-		slog.Error(
+		Logger.Error(
 			"an error occured, cannot validate object",
 			"name", 	 configmap.GetName(),
 			"namespace", configmap.GetNamespace(),
@@ -32,7 +34,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	objGroup 	 := configmap.GetObjectKind().GroupVersionKind().Group
 	objKind  	 := configmap.GetObjectKind().GroupVersionKind().Kind
 
-	slog.Info(
+	Logger.Info(
 		"proceeding to mutation of object",
 		"name", 	 objName,
 		"namespace", objNamespace,
@@ -44,11 +46,14 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	auditAnnotations := make(map[string]string, 2)
 	var keysRemoved []string
 
+	// Allow
+	allowed := true
+
 	// Warnings to give back to user
 	var forbiddenKeysFound []string
 
 	// Patches operations to do
-	var patches []string
+	var patches []PatchOperation
 
 	// User settings
 	forbiddenKeys := &GlobalForbiddenKeys.KeyList
@@ -56,7 +61,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	policy        :=  GlobalForbiddenKeys.Policy
 
 	// Remove forbidden keys if policy is set to auto
-	if policy == "auto" {
+	if policy == "AUTO" {
 
 		for key := range(configmap.Data) {
 
@@ -67,7 +72,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 			}
 			// Reject if key is forbidden
 			if slices.Contains(*forbiddenKeys, keyCheck) {
-				slog.Info(
+				Logger.Warn(
 					"found forbidden key during mutation which will be removed",
 					"name", 	 objName,
 					"namespace", objNamespace,
@@ -78,8 +83,11 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 				// Append warning
 				forbiddenKeysFound = append(forbiddenKeysFound, key)
 				// Remove path
-				patchOperation := "{'op': 'remove', 'path': '/spec/data/" + key + "'}"
-				// Append to patches slice
+				patchOperation := PatchOperation{
+					Operation: "remove",
+					Path: 	   "/data/" + key,
+				}
+				// Append to patches list
 				patches = append(patches, patchOperation)
 				// Add key to warning
 				keysRemoved = append(keysRemoved, key)
@@ -91,26 +99,47 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	auditAnnotations["policy"] 		= policy
 	auditAnnotations["keysRemoved"] = strings.Join(keysRemoved, ", ")
 
-	// Convert patches string then to bytes
-	patchesUnicode := "[" + strings.Join(patches, ",") + "]"
-	patchesBytes := []byte(patchesUnicode)
+	// Serialize patch operation
+	patchesBytes, err := json.Marshal(patches)
+	if err != nil {
+		Logger.Error("could not serialize patch operation", slog.Any("error", err))
+		allowed = false
+	}
 
-	// Warning for user
-	msg := 
-		"Forbidden keys found and removed during mutation: [" +
-	 	strings.Join(forbiddenKeysFound, ", ") +
-		"]"
+	Logger.Debug(
+		"patches operations to be performed",
+		slog.Any("patches", string(patchesBytes)),
+	)
 
 	patchType := admissionv1.PatchTypeJSONPatch
+
+	// Result for user
+	var result metav1.Status
+
+	if !allowed {
+		result.Status  = "Failure"
+		result.Code    = 406
+		result.Message = "using policy '" + policy + "' " +
+			"and case sensitive '" + strconv.FormatBool(caseSensitive) + "', " +
+			"following forbidden keys were removed: [" + strings.Join(forbiddenKeysFound, ", ") + "]"
+	}
 
 	// Create admission response
 	admissionResponse := admissionv1.AdmissionResponse{
 		UID: 		 	  admissionRequest.UID,
-		Allowed: 	      true,
-		Warnings: 		  []string{msg},
+		Allowed: 	      allowed,
 		AuditAnnotations: auditAnnotations,
 		Patch: 			  patchesBytes,
 		PatchType: 	 	  &patchType,
+		Result: 		  &result,
+	}
+
+	// User warnings
+	if policy == "AUTO" {
+		warnings := []string{
+			"policy is set to 'AUTO', any forbidden key found will be removed",
+		}
+		admissionResponse.Warnings = warnings
 	}
 
 	// Create admission review response
@@ -124,7 +153,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	// Convert response to bytes
 	responseBytes, err := json.Marshal(&admissionReviewNew)
 	if err != nil {
-		slog.Error(
+		Logger.Error(
 			"cannot marshal response",
 			"name", 	 objName,
 			"namespace", objNamespace,
@@ -134,7 +163,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	slog.Info(
+	Logger.Info(
 		"mutation done",
 		"name", 	 objName,
 		"namespace", objNamespace,
