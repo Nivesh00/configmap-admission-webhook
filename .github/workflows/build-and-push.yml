@@ -5,7 +5,7 @@ env:
   DOCKER_REGISTRY_URL: ghcr.io
   DOCKER_REPOSITORY: nivesh00
   DOCKER_IMAGE_NAME: configmap-manager
-  DOCKER_IMAGE_TAG: ""
+  DOCKER_IMAGE_TAG: "v1.0.0"
 
 on:
   push:
@@ -43,6 +43,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+          tags: |
+            ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}
+            ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.ACCESS_TOKEN }}
