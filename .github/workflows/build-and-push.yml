@@ -31,8 +31,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.ACCESS_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Buil and push to 
       - name: Build and Push the Docker Image
@@ -43,4 +43,4 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.ACCESS_TOKEN }}
+            GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
