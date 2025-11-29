@@ -71,3 +71,7 @@ By using the `kind` overlay, the resources are created in the namespace `configm
 kustomize build kustomize/overlays/kind | kubectl apply -f -
 ```
 Alternatively, the `kind` overlay can be used as a template for other overlays
+
+## Limitation
+
+- Sensitive data can still be directly mounted to pods as enivronmental variables, which is also insecure
