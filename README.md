@@ -14,12 +14,14 @@ The webhook server takes 2 arguments:
 - `--port` which is the port used by the server to listen to requests (default is 443)
 
 The server uses environmental variables to define its behavior:
-- `FORBIDDEN_KEYS` is a string of comma-seperated values. The webhook will then look for keys matching the values in a configmap in the path `.data` (this is a required parameter)
-  - users should pay special attention to remove any newline
-- `POLICY` defines the bahavior when the webhook discovers a forbidden key in the configmap
-  - `AUTO` removes the forbidden keys from the configmap
-  - `MANUAL` rejects the configmap (this is the dafault value)
-- `CASE_SENSITIVE` is set to `true` if the check should be case sensitive and `false` if not (default is true)
+
+| Key  | Value  | Notes  |
+|:---:|:---:|:---:|
+| *`FORBIDDEN_KEYS`  |  Comma seperated values of type string | The webhook will then look for keys matching the values in a configmap in the path `.data`. Users should make sure extra new lines are removed | 
+| `POLICY`  | `AUTO` or `MANUAL` (default)  | defines the bahavior when the webhook discovers a forbidden key in the configmap. `AUTO` removes keys from configmap and `MANUAL` rejects the configmap  |
+| `CASE_SENSITIVE`  | `true` (default) or `false` | checks whether the upper- and lowercase letters are important for forbidden keys check  |
+
+*required
 
 Example of a configmap for these values which can be mounted to the webhook pod:
 
