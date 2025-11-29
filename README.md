@@ -59,7 +59,7 @@ The certificates for the webhook configurations are then mounted using the certi
 https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-certificate-resource
 
 
-## manifests files
+## Manifests Files
 > [!WARNING]
 > Manifest files are not yet fully created
 
