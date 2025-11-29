@@ -1,0 +1,30 @@
+# Name of workflow
+name: Build and Push Image
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+  DOCKER_REGISTRY_URL: ghcr.io
+  DOCKER_REPOSITORY: nivesh00
+  DOCKER_IMAGE_NAME: configmap-manager
+  DOCKER_IMAGE_TAG: "0.1.0"
+
+on:
+  push:
+    # Only run on `main`
+    branches:
+      - main
+
+jobs:
+  docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      # Buil and push to 
+      - name: Build and Push the Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+          secrets: |
+            GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
