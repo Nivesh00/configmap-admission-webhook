@@ -1,4 +1,4 @@
-# $${\color{white}Configmap \space Admission \space Webhook}$$
+#  Configmap Admission Webhook
 
 Webhook is used to check keys in a configmap and can either reject the configmap or edit it to remove the forbidden keys.
 
