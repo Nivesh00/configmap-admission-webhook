@@ -5,7 +5,7 @@ Webhook is used to check keys in a configmap and can either reject the configmap
 Since configmaps are stored on disk, it is not recommended to store sensitive data like api keys, passwords etc. in them. These kind of data are better store in a secret, which are stored in memory.
 
 > [!CAUTION]
-> This repo is more a learning project that anything and is not intended to be actually used
+> This repo is more a learning project that anything and is not intended to be actually used e.g. in production etc.
 
 ## Webhook Server
 
