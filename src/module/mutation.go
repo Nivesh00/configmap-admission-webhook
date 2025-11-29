@@ -68,7 +68,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 			}
 			// Reject if key is forbidden
 			if slices.Contains(*forbiddenKeys, keyCheck) {
-				Logger.Warn(
+				Logger.Debug(
 					"found forbidden key during mutation which will be removed",
 					"name", 	 objName,
 					"namespace", objNamespace,
@@ -129,7 +129,7 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	// User warnings
 	if policy == "AUTO" {
 		warnings := []string{
-			"policy is set to 'AUTO', any forbidden key found will be removed",
+			"policy is set to 'AUTO', any forbidden key found will be removed before applying configmap",
 		}
 		admissionResponse.Warnings = warnings
 	}

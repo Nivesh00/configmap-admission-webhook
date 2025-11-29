@@ -1,12 +1,136 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - ../../base
-patchesStrategicMerge:
-  - webhook.yml
 
-Namespace:
-  configmap-webhook
+resources:
+- ../../base
+
+namespace: configmap-manager
 
 patches:
-  - path: webhook.yml
+  # Configmap
+  - target:
+      kind: ConfigMap
+      name: configmap-manager-settings
+    path: configmap-manager-settings.yml
+
+  # Namespace
+  - target:
+      kind: Namespace
+      name: default
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: configmap-manager
+
+  # Mutating Webhook Conf
+  - target:
+      kind: MutatingWebhookConfiguration
+      name: configmap-manager-webhook-config
+    patch: |-
+      # Webhook SSL Cert
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1inject-ca-from
+        value: configmap-manager/configmap-manager-certificate
+
+      # Webhook Name
+      - op: replace
+        path: /webhooks/0/name
+        value: configmap-manager-service.configmap-manager.svc
+  
+      # Webhook Service
+      - op: replace
+        path: /webhooks/0/clientConfig/service/name
+        value: configmap-manager-service
+      - op: replace
+        path: /webhooks/0/clientConfig/service/namespace
+        value: configmap-manager
+      - op: replace
+        path: /webhooks/0/clientConfig/service/port
+        value: 443
+      - op: replace
+        path: /webhooks/0/clientConfig/service/path
+        value: /mutate
+
+  # Validating Webhook Conf
+  - target:
+      kind: ValidatingWebhookConfiguration
+      name: configmap-manager-webhook-config
+    patch: |-
+      # Webhook SSL Cert
+      - op: replace
+        path: /metadata/annotations/cert-manager.io~1inject-ca-from
+        value: configmap-manager/configmap-manager-certificate
+
+      # Webhook Name
+      - op: replace
+        path: /webhooks/0/name
+        value: configmap-manager-service.configmap-manager.svc
+
+      # Webhook Service
+      - op: replace
+        path: /webhooks/0/clientConfig/service/name
+        value: configmap-manager-service
+      - op: replace
+        path: /webhooks/0/clientConfig/service/namespace
+        value: configmap-manager
+      - op: replace
+        path: /webhooks/0/clientConfig/service/port
+        value: 443
+      - op: replace
+        path: /webhooks/0/clientConfig/service/path
+        value: /validate
+
+  # Certificate
+  - target:
+      kind: Certificate
+      name: configmap-manager-certificate
+    patch: |-
+      # SSL Cert Secret Name
+      - op: replace
+        path: /spec/secretName
+        value: configmap-manager-certificate-secret
+
+      # DNS
+      - op: replace
+        path: /spec/dnsNames/0
+        value: configmap-manager-service.configmap-manager.svc
+
+  # Deployment
+  - target:
+      kind: Deployment
+      name: server
+    patch: |-
+      # Image
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: ghcr.io/nivesh00/configmap-admission-webhook:debug
+
+      # Container Port
+      - op: replace
+        path: /spec/template/spec/containers/0/ports/0/containerPort
+        value: 443
+
+      # Log level
+      - op: replace
+        path: /spec/template/spec/containers/0/args/1
+        value: info
+
+      # Port Server Listenes to
+      - op: replace
+        path: /spec/template/spec/containers/0/args/3
+        value: "443"
+
+      # SSL Cert
+      - op: replace
+        path: /spec/template/spec/volumes/0/secret/secretName
+        value: configmap-manager-certificate-secret
+
+  # Service
+  - target:
+      kind: Service
+      name: service
+    patch: |-
+      # Target port
+      - op: replace
+        path: /spec/ports/0/targetPort
+        value: "443"

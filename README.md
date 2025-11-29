@@ -1,4 +1,4 @@
-#  Configmap Admission Webhook
+#  Configmap Manager
 
 Webhook is used to check keys in a configmap and can either reject the configmap or edit it to remove the forbidden keys.
 
@@ -60,7 +60,10 @@ https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-cert
 
 
 ## Manifests Files
-> [!WARNING]
-> Manifest files are not yet fully created
 
-Manifests files can be found in the `kustomize` directory. The manifest files are not yet created but test manifest files can be found in same directory
+> [!CAUTION]
+> Make sure to install Cert Manager CRDs mentioned above first before using manifests
+
+Manifests files can be found in the `kustomize` directory. The manifest files are not yet created but test manifest files can be found in same directory.
+
+By using the `kind` overlay, the resources are created in the namespace `configmap-manager`.

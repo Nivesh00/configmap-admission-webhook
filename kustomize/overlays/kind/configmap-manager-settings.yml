@@ -1,0 +1,11 @@
+- op: replace
+  path: /data/FORBIDDEN_KEYS
+  value: API_KEY
+
+- op: replace
+  path: /data/POLICY
+  value: AUTO
+
+- op: replace
+  path: /data/CASE_SENSITIVE
+  value: "true"

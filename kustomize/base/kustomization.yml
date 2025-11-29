@@ -2,5 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - service.yml
-  - webhook.yml
+  - 00_namespace.yml
+  - 01_webhook-configmap.yml
+  - 02_webhook-service.yml
+  - 03_mutating-webhook-conf.yml
+  - 04_validating-webhook-conf.yml
+  - 05_certificate.yml
+  - 06_issuer.yml
+  - 07_webhook-deployment.yml

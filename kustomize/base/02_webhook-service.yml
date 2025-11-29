@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: configmap-manager-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+  selector:
+    app: configmap-manager-server
+  type: ClusterIP

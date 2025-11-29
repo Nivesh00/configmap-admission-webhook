@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: configmap-manager-certificate
+spec:
+  secretName: configmap-manager-certificate-secret
+  dnsNames:
+    - configmap-manager-service.default.svc
+  issuerRef:
+    name: selfsigned-issuer

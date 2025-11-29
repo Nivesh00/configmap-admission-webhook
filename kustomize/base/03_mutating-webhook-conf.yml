@@ -1,0 +1,22 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: configmap-manager-webhook-config
+  annotations:
+    cert-manager.io/inject-ca-from: default/configmap-manager-certificate
+webhooks:
+  - name: configmap-manager-service.default.svc
+    rules:
+      - apiGroups:   ['']
+        apiVersions: [v1]
+        operations:  [CREATE, UPDATE]
+        resources:   [configmaps]
+        scope:       Namespaced
+    clientConfig:
+      service:
+        name: configmap-manager-service
+        namespace: default
+        port: 443
+        path: /mutate
+    admissionReviewVersions: [v1]
+    sideEffects: None

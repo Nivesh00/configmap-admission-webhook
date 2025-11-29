@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+    app: configmap-manager-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configmap-manager-server
+  template:
+    metadata:
+      labels:
+        app: configmap-manager-server
+    spec:
+      containers:
+      - name: configmap-manager-server
+        image: ghcr.io/nivesh00/configmap-admission-webhook:debug
+        ports:
+        - containerPort: 443
+        command: ["/app/admission-webhook"]
+        args: ["--log-level", "debug", "--port", "443"]
+        envFrom:
+        - configMapRef:
+            name: configmap-manager-settings
+        volumeMounts:
+        - name: ssl-certs
+          mountPath: /etc/certs
+          readOnly: true
+      volumes:
+        - name: ssl-certs
+          secret:
+            secretName: configmap-manager-certificate-secret

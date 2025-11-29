@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-manager-settings
+data:
+  FORBIDDEN_KEYS: >-
+    API_KEYS
