@@ -34,7 +34,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Buil and push to 
       - name: Build and Push the Docker Image
         uses: docker/build-push-action@v6
         with:
