@@ -16,7 +16,15 @@ on:
 
 jobs:
   docker_image:
+  
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
       # Checkout the code
       - name: Checkout code
