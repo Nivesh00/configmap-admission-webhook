@@ -17,7 +17,7 @@ The server uses environmental variables to define its behavior:
 
 | Key  | Value  | Notes  |
 |:---:|:---:|:---:|
-| *`FORBIDDEN_KEYS` (required)  |  Comma seperated values of type string | The webhook will then look for keys matching the values in a configmap in the path `.data`. Users should make sure extra new lines are removed | 
+| `FORBIDDEN_KEYS` (required)  |  Comma seperated values of type string | The webhook will then look for keys matching the values in a configmap in the path `.data`. Users should make sure extra new lines are removed | 
 | `POLICY`  | `AUTO` or `MANUAL` (default)  | defines the bahavior when the webhook discovers a forbidden key in the configmap. `AUTO` removes keys from configmap and `MANUAL` rejects the configmap  |
 | `CASE_SENSITIVE`  | `true` (default) or `false` | checks whether the upper- and lowercase letters are important for forbidden keys check  |
 
