@@ -61,7 +61,7 @@ https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-cert
 
 ## Manifests Files
 
-> [!WARNING]
+> [!INFO]
 > Make sure to install Cert Manager CRDs mentioned above first before using manifests
 
 Manifests files can be found in the `kustomize` directory. The manifest files are not yet created but test manifest files can be found in same directory.
