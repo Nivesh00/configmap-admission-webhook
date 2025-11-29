@@ -7,9 +7,9 @@ Since configmaps are stored on disk, it is not recommended to store sensitive da
 > [!CAUTION]
 > This repo is more of a learning project that anything else and is not intended to be actually used in production etc.
 
-## Webhook Server
+## Configmap Manager Server
 
-The webhook server takes 2 arguments:
+The configmap manager server takes 2 arguments:
 - `--log-level` which is the log level. Values are [debug,info,warn,error] (default is warn)
 - `--port` which is the port used by the server to listen to requests (default is 443)
 
@@ -36,7 +36,7 @@ data:
   CASE_SENSITIVE: "false"
 ```
 
-### Webhook Server Docker Image
+### Configmap Manager Server Docker Image
 
 The docker image can be found in this repository and can be pulled using following command:
 ```dh
@@ -54,7 +54,7 @@ Cert Manager can be installed suing this command:
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.1/cert-manager.yaml
 ```
 
-The certificates for the webhook configurations are then mounted using the certificate resource, read the Cert Manager docs for more information
+The certificates for the webhook configurations are then mounted using the certificate secret, read the Cert Manager docs for more information
 
 https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-certificate-resource
 
