@@ -2,10 +2,10 @@
   path: /data/FORBIDDEN_KEYS
   value: API_KEY
 
-- op: replace
+- op: add
   path: /data/POLICY
-  value: AUTO
+  value: MANUAL
 
-- op: replace
+- op: add
   path: /data/CASE_SENSITIVE
   value: "true"
