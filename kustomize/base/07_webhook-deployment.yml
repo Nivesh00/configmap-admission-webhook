@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: configmap-manager-server
-        image: ghcr.io/nivesh00/configmap-admission-webhook:debug
+        image: ghcr.io/nivesh00/configmap-manager
         ports:
         - containerPort: 443
         command: ["/app/admission-webhook"]

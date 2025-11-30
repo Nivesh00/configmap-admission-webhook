@@ -6,7 +6,7 @@ import (
     "fmt"
 	"os"
     "flag"
-	"github.com/Nivesh00/configmap-admission-webhook/src/module"
+	"github.com/Nivesh00/configmap-manager/src/module"
 )
 
 func main() {

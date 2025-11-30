@@ -75,6 +75,7 @@ type ForbiddenKeys struct {
 type PatchOperation struct {
     Operation string `json:"op"`
     Path      string `json:"path"`
+    Value     string `json:"value,omitempty"`
 }
 
 // Looks for environmental variables and adds them to

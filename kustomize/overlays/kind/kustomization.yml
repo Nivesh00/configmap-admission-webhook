@@ -103,7 +103,7 @@ patches:
       # Image
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: ghcr.io/nivesh00/configmap-admission-webhook:debug
+        value: ghcr.io/nivesh00/configmap-manager:1.0.0
 
       # Container Port
       - op: replace
@@ -113,7 +113,7 @@ patches:
       # Log level
       - op: replace
         path: /spec/template/spec/containers/0/args/1
-        value: info
+        value: debug
 
       # Port Server Listenes to
       - op: replace
